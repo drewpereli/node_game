@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Drew's Game</title>
+	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<style>
+		canvas
+		{
+			border: 1px solid black;
+		}
+	</style>
+	<script>
+	var frameRate = 10;
+	var socket = io();
+	var ctx;
+	var canvasWidth;
+	var canvasHeight;
+	var prevKeyDown = {};
+	var keydown = function(e)
+	{
+		if (prevKeyDown[e.which])
+		{
+			return;
+		}	
+		prevKeyDown[e.which] = true;	
+		var directions = [37, 38, 39, 40];
+		if (directions.indexOf(e.keyCode) !== -1)
+		{
+			e.preventDefault();
+			socket.emit('player move', e.keyCode);
+			return;
+		}
+		else if (e.keyCode === 32) //Spacebar
+		{
+			e.preventDefault();
+			socket.emit('player shoot');
+		}
+	}
+	var keyup = function(e)
+	{
+		prevKeyDown[e.which] = false;
+		var directions = [37, 38, 39, 40];
+		if (directions.indexOf(e.keyCode) !== -1)
+		{
+			socket.emit('player stop', e.keyCode);
+		}
+	}
+	document.addEventListener("keydown", keydown, false);
+	document.addEventListener("keyup", keyup, false);
+
+
+	$(function(){
+		ctx = $("#game-canvas")[0].getContext("2d");
+		ctx.fillStyle = "black";
+		socket.emit("document ready");
+		socket.on('update board', updateCanvas)
+	});
+	socket.on("set canvas dimensions", function(data){
+		$("#game-canvas").attr("width", data.width).attr("height", data.height);
+	});
+	socket.on("update player", function(data){
+		player = data;
+		updateCanvas();
+	});
+
+	var updateCanvas = function(gameObjects)
+	{
+		ctx.clearRect(0, 0, 500, 500);
+		for (var pI in gameObjects.players)
+		{
+			var currentPlayer = gameObjects.players[pI];
+			ctx.fillStyle = currentPlayer.color;	
+			ctx.fillRect(currentPlayer.x, currentPlayer.y, currentPlayer.width, currentPlayer.height);
+		}
+		for (var bI in gameObjects.bullets)
+		{
+			var b = gameObjects.bullets[bI];
+			ctx.fillRect(b.x, b.y, b.width, b.height);
+		}
+	}
+	</script>
+</head>
+<body>
+	<canvas id="game-canvas" width="500" height="500"></canvas>
+</body>
+</html>
