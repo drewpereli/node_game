@@ -1,6 +1,7 @@
-function Player(sId)
+function Player(sId, username)
 {
 	this.socketId = sId;
+	this.username = username;
 	this.x;
 	this.y;
 	this.width = 16;

@@ -5,9 +5,30 @@
 	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<style>
+		#game-section
+		{
+			display: none;
+		}
 		canvas
 		{
 			border: 1px solid black;
+			float: left;
+		}
+		ul#player-list
+		{
+			float: left;
+			list-style: none;
+		}
+
+		li
+		{
+			border-top: 1px solid gray;
+			border-bottom: 1px solid gray;
+			font-size: 3.5em;
+		}
+
+		.color-box
+		{
 		}
 	</style>
 	<script>
@@ -51,14 +72,47 @@
 
 
 	$(function(){
+
+		$("#username-form").submit(function(){
+			var username = $("#username").val();
+			socket.emit("sign up", username);
+			return false;
+		});
+
 		ctx = $("#game-canvas")[0].getContext("2d");
 		ctx.fillStyle = "black";
 		socket.emit("document ready");
+	});
+	socket.on("entered game", function(players){
+		$("#username-section").css("display", "none");
+		$("#game-section").css("display", "block");
 		socket.on('update board', updateCanvas);
+		for (var i in players)
+		{
+			addPlayerToList(players[i]);
+		}
 	});
 	socket.on("set canvas dimensions", function(data){
 		$("#game-canvas").attr("width", data.width).attr("height", data.height);
 	});
+	socket.on("player joined", function(player){
+		addPlayerToList(player);
+	});
+	socket.on("player quit", function(player){
+		removePlayerFromList(player);
+	});
+
+	function addPlayerToList(player)
+	{
+		$("<li id='" + player.socketId + "'><span class='color-box' style='color:" 
+			+ player.color + ";'>&#9632;</span>&nbsp;" 
+			+ player.username + "</li>")
+				.appendTo("#player-list");
+	}
+	function removePlayerFromList(player)
+	{
+		$("#" + player.socketId).remove();
+	}
 
 	var updateCanvas = function(gameObjects)
 	{
@@ -81,6 +135,20 @@
 	</script>
 </head>
 <body>
-	<canvas id="game-canvas" width="500" height="500"></canvas>
+	<div id="game-section">
+		<canvas id="game-canvas" width="500" height="500"></canvas>
+		<ul id="player-list">
+		</ul>
+	</div>
+	<div id="username-section">
+		<form id="username-form">
+			<label for="username">Enter a username: </label>
+			<input id="username" />
+			<br/>
+			<input type="submit" value="Enter the game"/>
+		</form>
+	</div>
 </body>
 </html>
+
+

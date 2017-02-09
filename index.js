@@ -24,11 +24,15 @@ app.get('/', function(req, res){
 
 
 io.on('connection', function(socket){
-	var newP = new playerConstructor(socket.id);
-	newP.spawnRandomly();
-	game.newPlayers.push(newP);
 	socket.on('document ready', function(){
 		socket.emit('set canvas dimensions', {width: canvasWidth, height: canvasHeight});
+	});
+	socket.on('sign up', function(username){
+		var newP = new playerConstructor(socket.id, username);
+		newP.spawnRandomly();
+		game.newPlayers.push(newP);
+		socket.emit("entered game", game.players);
+		io.emit("player joined", newP);
 	});
 	socket.on('player move', function(dir)
 	{
@@ -50,6 +54,7 @@ io.on('connection', function(socket){
 	socket.on('disconnect', function(){
 		if (p = game.findPlayer(socket.id))
 			p.quit();
+		io.emit("player quit", p);
 	});
 });
 
