@@ -49,7 +49,7 @@ io.on('connection', function(socket){
 	});
 	socket.on('disconnect', function(){
 		if (p = game.findPlayer(socket.id))
-			p.die();
+			p.quit();
 	});
 });
 

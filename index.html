@@ -66,6 +66,8 @@
 		for (var pI in gameObjects.players)
 		{
 			var currentPlayer = gameObjects.players[pI];
+			if (currentPlayer.dead)
+				continue;
 			ctx.fillStyle = currentPlayer.color;	
 			ctx.fillRect(currentPlayer.x, currentPlayer.y, currentPlayer.width, currentPlayer.height);
 		}

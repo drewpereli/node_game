@@ -44,44 +44,53 @@ Game.prototype.tick = function()
 	for (var pI in this.players)
 	{
 		var p = this.players[pI];
-		if (p.moving)
+		if (!p.dead)
 		{
-			var newX = p.x;
-			var newY = p.y;
-			switch (p.moving)
+			if (p.moving)
 			{
-				//Check boundaries later
-				case 37:
-					newX += -1 * p.speed;
-					break;
-				case 38:
-					newY += -1 * p.speed;
-					break;
-				case 39:
-					newX += p.speed;
-					break;
-				case 40:
-					newY += p.speed;
-					break;
-				default:
-					console.log("there was an moving. Direction: " + p.moving );
+				var newX = p.x;
+				var newY = p.y;
+				switch (p.moving)
+				{
+					//Check boundaries later
+					case 37:
+						newX += -1 * p.speed;
+						break;
+					case 38:
+						newY += -1 * p.speed;
+						break;
+					case 39:
+						newX += p.speed;
+						break;
+					case 40:
+						newY += p.speed;
+						break;
+					default:
+						console.log("there was an moving. Direction: " + p.moving );
+				}
+				if (newX >= 0 && newX <= canvasWidth - p.width
+					&& newY >= 0 && newY <= canvasHeight - p.height)
+				{
+					p.x = newX;
+					p.y = newY;
+				}
 			}
-			if (newX >= 0 && newX <= canvasWidth - p.width
-				&& newY >= 0 && newY <= canvasHeight - p.height)
+			if (p.framesUntilNextShot > 0)
 			{
-				p.x = newX;
-				p.y = newY;
+				p.framesUntilNextShot--;
 			}
 		}
-		if (p.framesUntilNextShot > 0)
+		else
 		{
-			p.framesUntilNextShot--;
+			p.framesUntilRespawn--;
+			if (p.framesUntilRespawn <= 0)
+				p.respawn();
 		}
 	}
 
 	for (var i = this.players.length - 1 ; i >= 0 ; i--)
 	{
-		if (this.players[i].dead)
+		if (this.players[i].quiting)
 			this.players.splice(i, 1);
 	}
 	for (var i = this.bullets.length - 1 ; i >= 0 ; i--)

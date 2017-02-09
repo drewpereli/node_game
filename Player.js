@@ -12,6 +12,10 @@ function Player(sId)
 	this.shootFrames = this.shootTime * 1000 / frameRate;
 	this.framesUntilNextShot = 0;
 	this.dead = false;
+	this.respawnTime = 1; //In seconds.
+	this.respawnFrames = this.respawnTime * 1000 / frameRate;
+	this.framesUntilRespawn;
+	this.quiting = false;
 	this.color = tools.getNextPlayerColor();
 }
 
@@ -76,11 +80,23 @@ Player.prototype.spawnRandomly = function()
 	this.die();
 }
 
+Player.prototype.respawn = function()
+{
+	this.dead = false;
+	this.framesUntilNextShot = 0;
+	this.moving = false;
+	this.spawnRandomly();
+}
+
 Player.prototype.die = function()
 {
 	this.dead = true;
-	console.log(colors);
-	console.log(availableColors);
+	this.framesUntilRespawn = this.respawnFrames;
+}
+
+Player.prototype.quit = function()
+{
+	this.quiting = true;
 	if (colors.indexOf(this.color) !== -1)
 	{
 		availableColors.push(this.color);
