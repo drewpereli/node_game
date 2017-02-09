@@ -54,14 +54,10 @@
 		ctx = $("#game-canvas")[0].getContext("2d");
 		ctx.fillStyle = "black";
 		socket.emit("document ready");
-		socket.on('update board', updateCanvas)
+		socket.on('update board', updateCanvas);
 	});
 	socket.on("set canvas dimensions", function(data){
 		$("#game-canvas").attr("width", data.width).attr("height", data.height);
-	});
-	socket.on("update player", function(data){
-		player = data;
-		updateCanvas();
 	});
 
 	var updateCanvas = function(gameObjects)
@@ -76,6 +72,7 @@
 		for (var bI in gameObjects.bullets)
 		{
 			var b = gameObjects.bullets[bI];
+			ctx.fillStyle = b.color;
 			ctx.fillRect(b.x, b.y, b.width, b.height);
 		}
 	}

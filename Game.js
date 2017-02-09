@@ -1,9 +1,110 @@
 
-var game = function Game()
+function Game()
 {
 	this.players = [];
 	this.bullets = [];
-	
+	this.newPlayers = [];
+	this.newBullets = [];
 }
 
-module.exports = game;
+Game.prototype.tick = function()
+{
+	for (var bI in this.bullets)
+	{
+		var b = this.bullets[bI];
+		var newX = b.x;
+		var newY = b.y;
+		switch (b.direction)
+		{
+			//Check boundaries later
+			case 37:
+				newX -= b.speed;
+				break;
+			case 38:
+				newY -= b.speed;
+				break;
+			case 39:
+				newX += b.speed;
+				break;
+			case 40:
+				newY += b.speed;
+				break;
+			default:
+				console.log("there was an error with the bullet.");
+		}
+		
+		b.x = newX;
+		b.y = newY;
+		b.processCollisions();
+		if (!b.dead && (b.x < 0 || b.y < 0 || b.x > canvasWidth - b.width || b.y > canvasHeight - b.height))
+		{
+			b.die();
+		}
+	}
+	for (var pI in this.players)
+	{
+		var p = this.players[pI];
+		if (p.moving)
+		{
+			var newX = p.x;
+			var newY = p.y;
+			switch (p.moving)
+			{
+				//Check boundaries later
+				case 37:
+					newX += -1 * p.speed;
+					break;
+				case 38:
+					newY += -1 * p.speed;
+					break;
+				case 39:
+					newX += p.speed;
+					break;
+				case 40:
+					newY += p.speed;
+					break;
+				default:
+					console.log("there was an moving. Direction: " + p.moving );
+			}
+			if (newX >= 0 && newX <= canvasWidth - p.width
+				&& newY >= 0 && newY <= canvasHeight - p.height)
+			{
+				p.x = newX;
+				p.y = newY;
+			}
+		}
+		if (p.framesUntilNextShot > 0)
+		{
+			p.framesUntilNextShot--;
+		}
+	}
+
+	for (var i = this.players.length - 1 ; i >= 0 ; i--)
+	{
+		if (this.players[i].dead)
+			this.players.splice(i, 1);
+	}
+	for (var i = this.bullets.length - 1 ; i >= 0 ; i--)
+	{
+		var b = this.bullets[i];
+		if (b.dead)
+			this.bullets.splice(i, 1);
+	}
+	this.players = this.players.concat(this.newPlayers);
+	this.newPlayers = [];
+	this.bullets = this.bullets.concat(this.newBullets);
+	this.newBullets = [];
+	io.emit("update board", {players: this.players, bullets: this.bullets});
+}
+
+Game.prototype.findPlayer = function(id)
+{
+	for (var i in this.players)
+	{
+		if (this.players[i].socketId === id)
+			return this.players[i];
+	}
+	return false;
+}
+
+module.exports = Game;

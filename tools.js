@@ -20,3 +20,22 @@ function getRandomColor() {
     }
     return color;
 }
+
+function getNextPlayerColor()
+{
+	if (availableColors.length > 0)
+	{
+		return availableColors.pop();
+	}
+	else
+	{
+		return getRandomColor();
+	}
+}
+
+module.exports = 
+{
+	collided: collided,
+	getRandomColor: getRandomColor,
+	getNextPlayerColor: getNextPlayerColor
+}

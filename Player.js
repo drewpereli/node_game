@@ -1,5 +1,6 @@
-function Player()
+function Player(sId)
 {
+	this.socketId = sId;
 	this.x;
 	this.y;
 	this.width = 16;
@@ -11,19 +12,7 @@ function Player()
 	this.shootFrames = this.shootTime * 1000 / frameRate;
 	this.framesUntilNextShot = 0;
 	this.dead = false;
-	this.color = getNextPlayerColor();
-}
-
-function getNextPlayerColor()
-{
-	if (colors.length > 0)
-	{
-		return colors.pop();
-	}
-	else
-	{
-		return getRandomColor();
-	}
+	this.color = tools.getNextPlayerColor();
 }
 
 
@@ -33,7 +22,7 @@ Player.prototype.shoot = function()
 	//Generate four bullets, centered on the player
 	for (var i = 0 ; i < 4 ; i++)
 	{
-		var b = new Bullet();
+		var b = new bulletConstructor(this.color);
 		b.y = this.y + this.height / 2 - b.height / 2; //Centered on player by default
 		b.x = this.x + this.width / 2 - b.width / 2;
 		switch (i)
@@ -52,9 +41,8 @@ Player.prototype.shoot = function()
 				break;
 		}
 		b.direction = 37 + i;
-		gameObjects.bullets.push(b);
+		game.newBullets.push(b);
 	}
-	this.shooting = false;
 	this.framesUntilNextShot = this.shootFrames;
 }
 
@@ -67,18 +55,18 @@ Player.prototype.spawnRandomly = function()
 		attempts++;
 		this.x = Math.floor(Math.random() * (canvasWidth - this.width));
 		this.y = Math.floor(Math.random() * (canvasHeight - this.height));
-		for (var pI in gameObjects.players)
+		for (var pI in game.players)
 		{
-			var p = gameObjects.players[pI];
-			if (p !== this && collided(this, p))
+			var p = game.players[pI];
+			if (p !== this && tools.collided(this, p))
 			{
 				continue attempting;
 			}
 		}
-		for (var bI in gameObjects.bullets)
+		for (var bI in game.bullets)
 		{
-			var b = gameObjects.bullets[bI];
-			if (collided(this, b))
+			var b = game.bullets[bI];
+			if (tools.collided(this, b))
 			{
 				continue attempting;
 			}
@@ -91,4 +79,14 @@ Player.prototype.spawnRandomly = function()
 Player.prototype.die = function()
 {
 	this.dead = true;
+	console.log(colors);
+	console.log(availableColors);
+	if (colors.indexOf(this.color) !== -1)
+	{
+		availableColors.push(this.color);
+	}
 }
+
+module.exports = Player;
+
+
