@@ -2,6 +2,7 @@ function Player(sId, username)
 {
 	this.socketId = sId;
 	this.username = username;
+	this.score = 0;
 	this.x;
 	this.y;
 	this.width = 16;
@@ -27,7 +28,7 @@ Player.prototype.shoot = function()
 	//Generate four bullets, centered on the player
 	for (var i = 0 ; i < 4 ; i++)
 	{
-		var b = new bulletConstructor(this.color);
+		var b = new bulletConstructor(this);
 		b.y = this.y + this.height / 2 - b.height / 2; //Centered on player by default
 		b.x = this.x + this.width / 2 - b.width / 2;
 		switch (i)

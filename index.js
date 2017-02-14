@@ -5,8 +5,8 @@ global.io = require('socket.io')(http);
 global.tools = require('./tools.js');
 global.playerConstructor = require('./Player.js');
 global.bulletConstructor = require('./Bullet.js');
-global.canvasWidth = 500;
-global.canvasHeight = 500;
+global.canvasWidth = 700;
+global.canvasHeight = 700;
 global.frameRate = 20;
 global.colors = [
 	"black",
@@ -32,7 +32,11 @@ io.on('connection', function(socket){
 		newP.spawnRandomly();
 		game.newPlayers.push(newP);
 		socket.emit("entered game", game.players);
-		io.emit("player joined", newP);
+		io.emit("player joined", {
+			socketId: newP.socketId,
+			color: newP.color,
+			username: newP.username
+		});
 	});
 	socket.on('player move', function(dir)
 	{
@@ -54,7 +58,7 @@ io.on('connection', function(socket){
 	socket.on('disconnect', function(){
 		if (p = game.findPlayer(socket.id))
 			p.quit();
-		io.emit("player quit", p);
+		io.emit("player quit", {socketId: p.socketId});
 	});
 });
 

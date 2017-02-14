@@ -103,8 +103,36 @@ Game.prototype.tick = function()
 	this.newPlayers = [];
 	this.bullets = this.bullets.concat(this.newBullets);
 	this.newBullets = [];
-	io.emit("update board", {players: this.players, bullets: this.bullets});
+	io.emit("update board", {players: this.getClientPlayerInfo(), bullets: this.getClientBulletInfo()});
 }
+
+
+Game.prototype.getClientPlayerInfo = function()
+{
+	return this.players.map((p)=>{
+		return {
+			color: p.color,
+			width: p.width,
+			height: p.height,
+			x: p.x,
+			y: p.y
+		}
+	});
+}
+
+Game.prototype.getClientBulletInfo = function()
+{
+	return this.bullets.map((b)=>{
+		return {
+			color: b.color,
+			width: b.width,
+			height: b.height,
+			x: b.x,
+			y: b.y
+		}
+	});
+}
+
 
 Game.prototype.findPlayer = function(id)
 {
@@ -117,3 +145,7 @@ Game.prototype.findPlayer = function(id)
 }
 
 module.exports = Game;
+
+
+
+

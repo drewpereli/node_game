@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Drew's Game</title>
+	<title>Game</title>
 	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<style>
+		#username-section form
+		{
+			width: 30%;
+			margin: auto;
+			margin-top: 3em;
+			font-size: 3em;
+		}
 		#game-section
 		{
 			display: none;
@@ -14,17 +21,24 @@
 			border: 1px solid black;
 			float: left;
 		}
-		ul#player-list
+		#right-column
 		{
 			float: left;
+		}
+		ul#player-list
+		{
 			list-style: none;
+		}
+		#message
+		{
+			margin-left: 3em;
 		}
 
 		li
 		{
 			border-top: 1px solid gray;
 			border-bottom: 1px solid gray;
-			font-size: 3.5em;
+			font-size: 3em;
 		}
 
 		.color-box
@@ -93,6 +107,8 @@
 		}
 	});
 	socket.on("set canvas dimensions", function(data){
+		canvasWidth = data.width;
+		canvasHeight = data.height;
 		$("#game-canvas").attr("width", data.width).attr("height", data.height);
 	});
 	socket.on("player joined", function(player){
@@ -101,22 +117,29 @@
 	socket.on("player quit", function(player){
 		removePlayerFromList(player);
 	});
+	socket.on("update score", function(player){
+		updatePlayerScore(player);
+	});
 
 	function addPlayerToList(player)
 	{
 		$("<li id='" + player.socketId + "'><span class='color-box' style='color:" 
 			+ player.color + ";'>&#9632;</span>&nbsp;" 
-			+ player.username + "</li>")
+			+ player.username + " | <span class='score'>0</span></li>")
 				.appendTo("#player-list");
 	}
 	function removePlayerFromList(player)
 	{
 		$("#" + player.socketId).remove();
 	}
+	function updatePlayerScore(player)
+	{
+		$("#" + player.socketId + " .score").html(player.score);
+	}
 
 	var updateCanvas = function(gameObjects)
 	{
-		ctx.clearRect(0, 0, 500, 500);
+		ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 		for (var pI in gameObjects.players)
 		{
 			var currentPlayer = gameObjects.players[pI];
@@ -136,9 +159,15 @@
 </head>
 <body>
 	<div id="game-section">
-		<canvas id="game-canvas" width="500" height="500"></canvas>
-		<ul id="player-list">
-		</ul>
+		<canvas id="game-canvas"></canvas>
+		<div id="right-column">
+			<ul id="player-list">
+			</ul>
+			<h3 id="message">
+			Arrow Keys to move<br/>Space bar to shoot<br/>
+			If you die, you'll respawn after 1 second.
+			</h3>
+		</div>
 	</div>
 	<div id="username-section">
 		<form id="username-form">

@@ -1,5 +1,6 @@
-function Bullet(color)
+function Bullet(shooter)
 {
+	this.shooter = shooter;
 	this.x;
 	this.y;
 	this.width = 8;
@@ -7,7 +8,6 @@ function Bullet(color)
 	this.speed = 6;
 	this.direction;
 	this.dead = false;
-	this.color = color;
 }
 
 Bullet.prototype.processCollisions = function()
@@ -17,6 +17,8 @@ Bullet.prototype.processCollisions = function()
 		var p = game.players[pI];
 		if (tools.collided(this, p))
 		{
+			this.shooter.score += 100;
+			io.emit("update score", {score: this.shooter.score});
 			p.die();
 			this.die();
 		}
