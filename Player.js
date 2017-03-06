@@ -47,7 +47,7 @@ Player.prototype.shoot = function()
 				break;
 		}
 		b.direction = 37 + i;
-		game.newBullets.push(b);
+		game.bullets.push(b);
 	}
 	this.framesUntilNextShot = this.shootFrames;
 }

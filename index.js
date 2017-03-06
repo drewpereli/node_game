@@ -30,9 +30,9 @@ io.on('connection', function(socket){
 	socket.on('sign up', function(username){
 		var newP = new playerConstructor(socket.id, username);
 		newP.spawnRandomly();
-		game.newPlayers.push(newP);
+		game.players.push(newP);
 		socket.emit("entered game", game.players);
-		io.emit("player joined", {
+		socket.broadcast.emit("player joined", {
 			socketId: newP.socketId,
 			color: newP.color,
 			username: newP.username

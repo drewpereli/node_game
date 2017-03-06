@@ -3,8 +3,6 @@ function Game()
 {
 	this.players = [];
 	this.bullets = [];
-	this.newPlayers = [];
-	this.newBullets = [];
 }
 
 Game.prototype.tick = function()
@@ -99,10 +97,6 @@ Game.prototype.tick = function()
 		if (b.dead)
 			this.bullets.splice(i, 1);
 	}
-	this.players = this.players.concat(this.newPlayers);
-	this.newPlayers = [];
-	this.bullets = this.bullets.concat(this.newBullets);
-	this.newBullets = [];
 	io.emit("update board", {players: this.getClientPlayerInfo(), bullets: this.getClientBulletInfo()});
 }
 
