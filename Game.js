@@ -115,7 +115,8 @@ Game.prototype.getClientPlayerInfo = function()
 			width: p.width,
 			height: p.height,
 			x: p.x,
-			y: p.y
+			y: p.y,
+			dead: p.dead
 		}
 	});
 }

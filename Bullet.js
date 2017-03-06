@@ -18,7 +18,7 @@ Bullet.prototype.processCollisions = function()
 		if (tools.collided(this, p))
 		{
 			this.shooter.score += 100;
-			io.emit("update score", {score: this.shooter.score});
+			io.emit("update score", {score: this.shooter.score, socketId: this.shooter.socketId});
 			p.die();
 			this.die();
 		}
